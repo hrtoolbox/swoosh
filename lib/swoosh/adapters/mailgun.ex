@@ -66,7 +66,12 @@ defmodule Swoosh.Adapters.Mailgun do
     |> prepare_cc(email)
     |> prepare_bcc(email)
     |> prepare_reply_to(email)
+    |> prepare_variables(email)
   end
+
+  defp prepare_variables(body, %Email{provider_options: []}), do: body
+  defp prepare_variables(body, %Email{provider_options: opts}), do: Enum.reduce opts, body, &prepare_variable/2
+  defp prepare_variable({key, value}, email), do: Map.put(email, key, value)
 
   defp prepare_from(body, %Email{from: from}), do: Map.put(body, :from, prepare_recipient(from))
 
